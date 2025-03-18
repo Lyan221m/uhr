@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+</head>
+<body>
+    <div class="container">
+        <h1>Timer</h1>
+        <div id="timerDisplay">00:00:00</div>
+        <div class="buttons">
+            <button id="startTimerButton">Start</button>
+            <button id="pauseTimerButton" disabled>Pause</button>
+            <button id="resetTimerButton" disabled>Reset</button>
+        </div>
+        
+        <button id="muteButton">🔕 Ton aus</button>
+        <button id="themeToggleButton">⬛Wechsel zu Dark Mode</button>
+        
+        <!-- Navigation zu anderen Seiten -->
+        <a href="stoppuhr.html" class="page-switch">⏱Zur Stoppuhr</a>
+        <a href="uhr.html" class="page-switch">🕐Zur Live-Uhr</a>
+    </div>
+    <audio id="timerSound" src="timer_sound.mp3"></audio>
+    <script src="script.js"></script>
+</body>
+</html>

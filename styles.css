@@ -1,0 +1,132 @@
+/* Allgemeiner Stil für beide Modi */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+    text-align: center;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.timer-section, .stopwatch-section {
+    margin-bottom: 30px;
+}
+
+input {
+    padding: 10px;
+    margin: 10px 0;
+    width: 150px;
+}
+
+.buttons {
+    margin: 10px 0;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+#timerDisplay, #stopwatchDisplay, #liveClock {
+    margin-top: 20px;
+    font-size: 36px;
+    font-weight: bold;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.page-switch {
+    display: block;
+    margin-top: 20px;
+    font-size: 18px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.page-switch:hover {
+    text-decoration: underline;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #333;
+    color: white;
+}
+
+.dark-mode .container {
+    background-color: #444;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode button {
+    background-color: #555;
+    color: white;
+}
+
+.dark-mode button:hover {
+    background-color: #666;
+}
+
+.dark-mode button:disabled {
+    background-color: #777;
+}
+
+.dark-mode #timerDisplay,
+.dark-mode #stopwatchDisplay,
+.dark-mode #liveClock {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.dark-mode .page-switch {
+    color: #4da6ff;
+}/* ... (vorherige Stile bleiben unverändert) */
+
+#muteButton {
+    margin-top: 10px;
+    background-color: #007bff;
+}
+
+#muteButton:hover {
+    background-color: #0056b3;
+}
+
+/* Dark Mode Styles */
+.dark-mode #muteButton {
+    background-color: #4da6ff;
+}
+
+.dark-mode #muteButton:hover {
+    background-color: #3a7fbf;
+}
+
+/* ... (Rest der Stile bleibt unverändert) */
