@@ -175,7 +175,7 @@ function updateLiveClock() {
 }
 
 // Aktualisiere die Live-Uhr jede Sekunde
-setInterval(updateLiveClock, 1000);
+setInterval(updateLiveClock, 100);
 
 // Initialisiere die Live-Uhr sofort
 updateLiveClock();
