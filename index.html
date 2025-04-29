@@ -11,7 +11,14 @@
 <body>
     <div class="container">
         <h1>Timer</h1>
-        <div id="timerDisplay">00:00:00</div>
+        
+        <div class="timer-container">
+            <div id="timerDisplay">00:00:00</div>
+            <div class="progress-container">
+                <div id="timerProgress" class="progress-bar"></div>
+            </div>
+        </div>
+        
         <div class="buttons">
             <button id="startTimerButton">Start</button>
             <button id="pauseTimerButton" disabled>Pause</button>

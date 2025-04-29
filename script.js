@@ -7,6 +7,7 @@ let isStopwatchRunning = false;
 let timerInterval;
 let timerTime = 0;
 let isTimerRunning = false;
+let initialTimerTime = 0; // Speichert die ursprüngliche Zeit des Timers
 
 // Buttons und Displays
 const startStopwatchButton = document.getElementById("startStopwatchButton");
@@ -18,6 +19,7 @@ const startTimerButton = document.getElementById("startTimerButton");
 const pauseTimerButton = document.getElementById("pauseTimerButton");
 const resetTimerButton = document.getElementById("resetTimerButton");
 const timerDisplay = document.getElementById("timerDisplay");
+const timerProgress = document.getElementById("timerProgress");
 
 const themeToggleButton = document.getElementById('themeToggleButton');
 
@@ -54,11 +56,23 @@ function updateTimer() {
         if (timerDisplay) {
             timerDisplay.textContent = formatTime(timerTime);
         }
+        
+        // Fortschrittsleiste aktualisieren
+        if (timerProgress && initialTimerTime > 0) {
+            const progressPercentage = 100 - ((timerTime / initialTimerTime) * 100);
+            timerProgress.style.width = `${progressPercentage}%`;
+        }
     } else {
         clearInterval(timerInterval);
         isTimerRunning = false;
         if (startTimerButton) startTimerButton.disabled = false;
         if (pauseTimerButton) pauseTimerButton.disabled = true;
+        
+        // Fortschrittsleiste auf 100% setzen, wenn der Timer abgelaufen ist
+        if (timerProgress) {
+            timerProgress.style.width = '100%';
+        }
+        
         if (timerSound && !isMuted) timerSound.play();
         alert("Timer abgelaufen!");
     }
@@ -98,22 +112,91 @@ if (resetStopwatchButton) {
     });
 }
 
-// Timer Funktionen
+// Timer Display bearbeitbar machen
 if (timerDisplay) {
+    // Klickbar machen mit Hinweis
+    timerDisplay.style.cursor = 'pointer';
+    timerDisplay.title = 'Klicken zum Bearbeiten';
+    
+    // Event Listener für direktes Bearbeiten
     timerDisplay.addEventListener("click", function() {
-        const input = prompt("Geben Sie die Zeit im Format HH:MM:SS ein:");
-        if (input !== null) {
-            const [hours, minutes, seconds] = input.split(':').map(Number);
-            if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds) && 
-                hours >= 0 && minutes >= 0 && seconds >= 0 && 
-                minutes < 60 && seconds < 60) {
-                timerTime = (hours * 3600 + minutes * 60 + seconds) * 1000;
-                timerDisplay.textContent = formatTime(timerTime);
-                resetTimerButton.disabled = false;
-            } else {
-                alert("Bitte geben Sie eine gültige Zeit im Format HH:MM:SS ein.");
-            }
+        // Nur erlauben, wenn der Timer nicht läuft
+        if (isTimerRunning) {
+            return;
         }
+        
+        // Vorherigen Inhalt speichern
+        const previousContent = timerDisplay.textContent;
+        
+        // Text zum Bearbeiten freigeben
+        timerDisplay.contentEditable = true;
+        timerDisplay.focus();
+        
+        // Text auswählen für einfachere Bearbeitung
+        document.execCommand('selectAll', false, null);
+        
+        // Event Listener für Enter-Taste
+        const enterKeyHandler = function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                timerDisplay.blur();
+            }
+        };
+        
+        // Event Listener für Verlassen des Feldes
+        const blurHandler = function() {
+            timerDisplay.contentEditable = false;
+            timerDisplay.removeEventListener('keydown', enterKeyHandler);
+            timerDisplay.removeEventListener('blur', blurHandler);
+            
+            // Eingabe verarbeiten
+            const input = timerDisplay.textContent.trim();
+            
+            // Zeit-Format überprüfen mit RegEx (Format: HH:MM:SS oder MM:SS oder SS)
+            const timePattern = /^(\d{1,2}):(\d{1,2}):(\d{1,2})$|^(\d{1,2}):(\d{1,2})$|^(\d{1,2})$/;
+            
+            if (timePattern.test(input)) {
+                let hours = 0, minutes = 0, seconds = 0;
+                const parts = input.split(':');
+                
+                if (parts.length === 3) {
+                    hours = parseInt(parts[0], 10);
+                    minutes = parseInt(parts[1], 10);
+                    seconds = parseInt(parts[2], 10);
+                } else if (parts.length === 2) {
+                    minutes = parseInt(parts[0], 10);
+                    seconds = parseInt(parts[1], 10);
+                } else {
+                    seconds = parseInt(parts[0], 10);
+                }
+                
+                // Überprüfen, ob die Werte im gültigen Bereich liegen
+                if (hours >= 0 && minutes >= 0 && seconds >= 0 && 
+                    minutes < 60 && seconds < 60) {
+                    
+                    timerTime = (hours * 3600 + minutes * 60 + seconds) * 1000;
+                    initialTimerTime = timerTime; // Speichern der Anfangszeit
+                    timerDisplay.textContent = formatTime(timerTime);
+                    resetTimerButton.disabled = false;
+                    
+                    // Zurücksetzen der Fortschrittsleiste auf 0%
+                    if (timerProgress) {
+                        timerProgress.style.width = '0%';
+                    }
+                } else {
+                    // Ungültiger Zeitwert
+                    timerDisplay.textContent = previousContent;
+                    alert("Bitte geben Sie eine gültige Zeit ein. Minuten und Sekunden müssen zwischen 0 und 59 liegen.");
+                }
+            } else {
+                // Ungültiges Format
+                timerDisplay.textContent = previousContent;
+                alert("Bitte geben Sie die Zeit im Format HH:MM:SS, MM:SS oder SS ein.");
+            }
+        };
+        
+        timerDisplay.addEventListener('keydown', enterKeyHandler);
+        timerDisplay.addEventListener('blur', blurHandler);
     });
 }
 
@@ -143,10 +226,16 @@ if (resetTimerButton) {
         clearInterval(timerInterval);
         isTimerRunning = false;
         timerTime = 0;
+        initialTimerTime = 0; // Zurücksetzen der Anfangszeit
         timerDisplay.textContent = formatTime(timerTime);
         startTimerButton.disabled = false;
         pauseTimerButton.disabled = true;
         resetTimerButton.disabled = true;
+        
+        // Fortschrittsleiste zurücksetzen
+        if (timerProgress) {
+            timerProgress.style.width = '0%';
+        }
     });
 }
 
