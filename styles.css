@@ -52,6 +52,33 @@ button:disabled {
     cursor: not-allowed;
 }
 
+/* Stil für Voreinstellungs-Buttons */
+.preset-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.preset-button {
+    padding: 8px 12px;
+    margin: 3px;
+    background-color: #17a2b8;
+    font-size: 14px;
+}
+
+.preset-button:hover {
+    background-color: #138496;
+}
+
+.dark-mode .preset-button {
+    background-color: #138496;
+}
+
+.dark-mode .preset-button:hover {
+    background-color: #0f6674;
+}
+
 #stopwatchDisplay, #liveClock {
     margin-top: 20px;
     font-size: 36px;

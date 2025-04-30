@@ -26,6 +26,9 @@ const themeToggleButton = document.getElementById('themeToggleButton');
 const timerSound = document.getElementById('timerSound');
 const muteButton = document.getElementById('muteButton');
 
+// Timer-Voreinstellungen
+const presetButtons = document.querySelectorAll('.preset-button');
+
 let isMuted = false;
 
 // Funktion zum Formatieren der Zeit (HH:MM:SS)
@@ -76,6 +79,36 @@ function updateTimer() {
         if (timerSound && !isMuted) timerSound.play();
         alert("Timer abgelaufen!");
     }
+}
+
+// Funktion zum Setzen des Timers auf einen bestimmten Wert in Sekunden
+function setTimer(seconds) {
+    if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        startTimerButton.disabled = false;
+        pauseTimerButton.disabled = true;
+    }
+    
+    timerTime = seconds * 1000;
+    initialTimerTime = timerTime;
+    timerDisplay.textContent = formatTime(timerTime);
+    
+    if (timerProgress) {
+        timerProgress.style.width = '0%';
+    }
+    
+    resetTimerButton.disabled = false;
+}
+
+// Event-Listener für Timer-Voreinstellungen
+if (presetButtons) {
+    presetButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const seconds = parseInt(this.getAttribute('data-time'));
+            setTimer(seconds);
+        });
+    });
 }
 
 // Stoppuhr Funktionen
