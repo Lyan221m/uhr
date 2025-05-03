@@ -9,6 +9,11 @@ let timerTime = 0;
 let isTimerRunning = false;
 let initialTimerTime = 0; // Speichert die ursprüngliche Zeit des Timers
 
+// Wecker Funktionalität
+let alarms = [];
+let activeAlarm = null;
+let alarmCheckInterval;
+
 // Buttons und Displays
 const startStopwatchButton = document.getElementById("startStopwatchButton");
 const pauseStopwatchButton = document.getElementById("pauseStopwatchButton");
@@ -24,7 +29,15 @@ const timerProgress = document.getElementById("timerProgress");
 const themeToggleButton = document.getElementById('themeToggleButton');
 
 const timerSound = document.getElementById('timerSound');
+const alarmSound = document.getElementById('alarmSound');
 const muteButton = document.getElementById('muteButton');
+
+// Wecker-Elemente
+const currentTimeDisplay = document.getElementById("currentTime");
+const alarmTimeInput = document.getElementById("alarmTime");
+const setAlarmButton = document.getElementById("setAlarmButton");
+const clearAlarmsButton = document.getElementById("clearAlarmsButton");
+const alarmsList = document.getElementById("alarmsList");
 
 // Timer-Voreinstellungen
 const presetButtons = document.querySelectorAll('.preset-button');
@@ -276,7 +289,8 @@ if (resetTimerButton) {
 if (muteButton) {
     muteButton.addEventListener('click', function() {
         isMuted = !isMuted;
-        timerSound.muted = isMuted;
+        if (timerSound) timerSound.muted = isMuted;
+        if (alarmSound) alarmSound.muted = isMuted;
         muteButton.textContent = isMuted ? '🔊 Ton an' : '🔕 Ton aus';
     });
 }
@@ -293,6 +307,143 @@ function updateLiveClock() {
     const liveClockElement = document.getElementById('liveClock');
     if (liveClockElement) {
         liveClockElement.textContent = timeString;
+    }
+    
+    // Aktualisiere die Zeitanzeige auf der Wecker-Seite
+    if (currentTimeDisplay) {
+        currentTimeDisplay.textContent = `Aktuelle Zeit: ${timeString}`;
+    }
+    
+    // Überprüfe aktive Wecker
+    checkAlarms(hours, minutes, seconds);
+}
+
+// Wecker Funktionalität
+function addAlarm(time) {
+    const alarmId = Date.now(); // Eindeutige ID für den Wecker
+    const alarm = {
+        id: alarmId,
+        time: time
+    };
+    
+    alarms.push(alarm);
+    saveAlarms(); // Wecker speichern
+    updateAlarmList(); // Weckerliste aktualisieren
+    
+    return alarm;
+}
+
+function removeAlarm(id) {
+    alarms = alarms.filter(alarm => alarm.id !== id);
+    saveAlarms(); // Aktualisierte Liste speichern
+    updateAlarmList(); // Weckerliste aktualisieren
+}
+
+function clearAllAlarms() {
+    alarms = [];
+    saveAlarms();
+    updateAlarmList();
+    
+    // Aktiven Alarm stoppen
+    stopAlarm();
+}
+
+function saveAlarms() {
+    localStorage.setItem('wecker_alarms', JSON.stringify(alarms));
+}
+
+function loadAlarms() {
+    const savedAlarms = localStorage.getItem('wecker_alarms');
+    if (savedAlarms) {
+        alarms = JSON.parse(savedAlarms);
+    }
+}
+
+function updateAlarmList() {
+    if (!alarmsList) return;
+    
+    // Liste leeren
+    alarmsList.innerHTML = '';
+    
+    if (alarms.length === 0) {
+        const emptyItem = document.createElement('li');
+        emptyItem.textContent = 'Keine aktiven Wecker';
+        emptyItem.className = 'no-alarms';
+        alarmsList.appendChild(emptyItem);
+        return;
+    }
+    
+    // Wecker sortieren nach Zeit
+    alarms.sort((a, b) => {
+        return a.time.localeCompare(b.time);
+    });
+    
+    // Wecker zur Liste hinzufügen
+    alarms.forEach(alarm => {
+        const alarmItem = document.createElement('li');
+        alarmItem.className = 'alarm-item';
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.textContent = alarm.time;
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '🗑️';
+        deleteButton.className = 'delete-alarm';
+        deleteButton.addEventListener('click', () => removeAlarm(alarm.id));
+        
+        alarmItem.appendChild(timeSpan);
+        alarmItem.appendChild(deleteButton);
+        alarmsList.appendChild(alarmItem);
+    });
+}
+
+function checkAlarms(hours, minutes, seconds) {
+    // Nur prüfen, wenn Sekunden 0 sind, um Ressourcen zu sparen
+    if (seconds !== '00') return;
+    
+    const currentTime = `${hours}:${minutes}`;
+    
+    // Überprüfen, ob ein Wecker für die aktuelle Zeit existiert
+    const matchingAlarm = alarms.find(alarm => alarm.time === currentTime);
+    
+    if (matchingAlarm && !activeAlarm) {
+        // Alarm auslösen
+        triggerAlarm(matchingAlarm);
+    }
+}
+
+function triggerAlarm(alarm) {
+    activeAlarm = alarm;
+    
+    // Ton abspielen, wenn nicht stumm
+    if (alarmSound && !isMuted) {
+        alarmSound.play();
+    }
+    
+    // Benachrichtigung anzeigen
+    if (Notification.permission === "granted") {
+        new Notification("Wecker", {
+            body: `Es ist ${alarm.time} Uhr!`,
+            icon: "assets/favicon3.ico"
+        });
+    }
+    
+    // Alert-Dialog anzeigen
+    const confirmStop = confirm(`Wecker für ${alarm.time} Uhr!\nWecker beenden?`);
+    if (confirmStop) {
+        stopAlarm();
+    }
+}
+
+function stopAlarm() {
+    if (activeAlarm) {
+        // Ton stoppen
+        if (alarmSound) {
+            alarmSound.pause();
+            alarmSound.currentTime = 0;
+        }
+        
+        activeAlarm = null;
     }
 }
 
@@ -311,3 +462,59 @@ if (themeToggleButton) {
             : '⬛Wechsel zu Dark Mode';
     });
 }
+
+// Wecker Seite initialisieren
+if (setAlarmButton) {
+    // Wecker aus dem lokalen Speicher laden
+    loadAlarms();
+    updateAlarmList();
+    
+    // Event-Listener für den Wecker-Button
+    setAlarmButton.addEventListener('click', function() {
+        if (alarmTimeInput && alarmTimeInput.value) {
+            addAlarm(alarmTimeInput.value);
+            alarmTimeInput.value = '';
+        } else {
+            alert('Bitte eine gültige Weckzeit eingeben!');
+        }
+    });
+    
+    // Notification-Berechtigungen anfordern
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission();
+    }
+}
+
+// Event-Listener für "Alle löschen" Button
+if (clearAlarmsButton) {
+    clearAlarmsButton.addEventListener('click', function() {
+        if (confirm('Möchten Sie wirklich alle Wecker löschen?')) {
+            clearAllAlarms();
+        }
+    });
+}
+
+// Füge den Wecker-Link zu den anderen Seiten hinzu
+document.addEventListener('DOMContentLoaded', function() {
+    const containers = document.querySelectorAll('.container');
+    
+    containers.forEach(container => {
+        // Überprüfen, ob wir auf der Wecker-Seite sind oder nicht
+        const isOnWeckerPage = window.location.href.includes('wecker.html');
+        
+        // Wecker-Link zu den anderen Seiten hinzufügen, wenn wir nicht auf der Wecker-Seite sind
+        if (!isOnWeckerPage) {
+            const lastLink = container.querySelector('.page-switch:last-child');
+            
+            if (lastLink) {
+                const weckerLink = document.createElement('a');
+                weckerLink.href = 'wecker.html';
+                weckerLink.className = 'page-switch';
+                weckerLink.textContent = '⏰Zum Wecker';
+                
+                // Link nach dem letzten Link einfügen
+                lastLink.after(weckerLink);
+            }
+        }
+    });
+});
