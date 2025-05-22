@@ -79,6 +79,25 @@ button:disabled {
     background-color: #0f6674;
 }
 
+/* Benutzerdefinierte Voreinstellungen hervorheben */
+.preset-button.custom-preset {
+    background-color: #6f42c1;
+    border: 2px solid #563d7c;
+}
+
+.preset-button.custom-preset:hover {
+    background-color: #563d7c;
+}
+
+.dark-mode .preset-button.custom-preset {
+    background-color: #7952b3;
+    border-color: #6f42c1;
+}
+
+.dark-mode .preset-button.custom-preset:hover {
+    background-color: #6f42c1;
+}
+
 #stopwatchDisplay, #liveClock {
     margin-top: 20px;
     font-size: 36px;
@@ -162,6 +181,24 @@ body.dark-mode {
     padding: 0;
     border-radius: 10px;
     overflow: hidden;
+    transition: box-shadow 0.5s ease;
+}
+
+/* Blink-Effekt für Timer kurz vor Ablauf */
+.timer-container.blink {
+    animation: redBlink 1s infinite;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+}
+
+@keyframes redBlink {
+    0%, 50% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+        border: 3px solid rgba(255, 0, 0, 0.8);
+    }
+    51%, 100% {
+        box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+        border: 3px solid rgba(255, 0, 0, 1);
+    }
 }
 
 .progress-container {
@@ -180,6 +217,11 @@ body.dark-mode {
     width: 0%;
     background-color: rgba(40, 167, 69, 0.3);
     transition: width 1s linear;
+}
+
+/* Fortschrittsleiste während des Blinkens */
+.timer-container.blink .progress-bar {
+    background-color: rgba(255, 0, 0, 0.4);
 }
 
 #timerDisplay {
@@ -214,6 +256,11 @@ body.dark-mode {
     background-color: rgba(77, 166, 255, 0.3);
 }
 
+/* Dark Mode Blink-Effekt */
+.dark-mode .timer-container.blink .progress-bar {
+    background-color: rgba(255, 100, 100, 0.4);
+}
+
 /* Styling für die Eingabe */
 #timerDisplay:focus {
     border: 2px dashed rgba(0, 123, 255, 0.5);
@@ -230,6 +277,223 @@ body.dark-mode {
 
 .dark-mode #timerDisplay::placeholder {
     color: rgba(255, 255, 255, 0.4);
+}
+
+/* Einstellungs-Button */
+.settings-button {
+    background-color: #6c757d;
+    margin-top: 15px;
+}
+
+.settings-button:hover {
+    background-color: #5a6268;
+}
+
+.dark-mode .settings-button {
+    background-color: #495057;
+}
+
+.dark-mode .settings-button:hover {
+    background-color: #343a40;
+}
+
+/* Modal für Einstellungen */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.dark-mode .modal-content {
+    background-color: #444;
+    color: white;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.setting-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.dark-mode .setting-option {
+    border-color: #666;
+    background-color: #3a3a3a;
+}
+
+.setting-option input[type="checkbox"] {
+    margin: 0;
+    width: auto;
+}
+
+.setting-option input[type="number"],
+.setting-option select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: white;
+}
+
+.dark-mode .setting-option input[type="number"],
+.dark-mode .setting-option select {
+    background-color: #2c2c2c;
+    color: white;
+    border-color: #555;
+}
+
+.setting-option label {
+    flex-grow: 1;
+    margin: 0;
+    font-weight: bold;
+}
+
+/* Benutzerdefinierte Voreinstellungen */
+.custom-presets-list {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.dark-mode .custom-presets-list {
+    border-color: #666;
+    background-color: #3a3a3a;
+}
+
+.custom-preset-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.dark-mode .custom-preset-item {
+    border-bottom-color: #555;
+}
+
+.custom-preset-item:last-child {
+    border-bottom: none;
+}
+
+.delete-preset {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 2px 5px;
+    margin: 0;
+    font-size: 16px;
+}
+
+.delete-preset:hover {
+    color: #c82333;
+    background: none;
+}
+
+.dark-mode .delete-preset {
+    color: #ff6b6b;
+}
+
+.dark-mode .delete-preset:hover {
+    color: #ff5252;
+}
+
+.add-preset {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.add-preset input {
+    flex: 1;
+    min-width: 120px;
+    padding: 5px;
+    margin: 0;
+}
+
+.add-preset button {
+    margin: 0;
+    padding: 5px 10px;
+    background-color: #28a745;
+}
+
+.add-preset button:hover {
+    background-color: #218838;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.dark-mode .modal-buttons {
+    border-top-color: #666;
+}
+
+.save-btn {
+    background-color: #28a745;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Separator */
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+.dark-mode hr {
+    border-top-color: #666;
 }
 
 /* Wecker-Styles */
@@ -376,4 +640,31 @@ body.dark-mode {
 
 .dark-mode .no-alarms {
     color: #adb5bd;
+}
+
+/* Responsive Design für Mobile */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .add-preset {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .add-preset input {
+        min-width: auto;
+        margin-bottom: 5px;
+    }
+    
+    .preset-buttons {
+        justify-content: center;
+    }
+    
+    .preset-button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
 }
